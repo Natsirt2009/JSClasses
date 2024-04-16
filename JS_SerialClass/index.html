@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+	background: #111;
+}
+button:focus-visible {
+	outline: none;
+}
+#buttons {
+	display: grid;
+	justify-items: stretch;
+}
+#Errors {
+	color: #F00;
+	overflow: auto;
+	display: inline;
+}
+#SER_op {
+	border: 2px solid #F00;
+	background-color: #333;
+	color: #FFF;
+	margin-bottom: 2px;
+	margin-top: 2px;
+}
+#SEND {
+	border: 2px solid #000;
+	background-color: #333;
+	color: #FFF;
+	margin-bottom: 2px;
+	margin-top: 2px;
+}
+input#Line {
+	border: hidden;
+	border-radius: 5px;
+	padding: unset;
+	color: #0FF;
+	background-color: #333;
+	text-indent: 3px;
+	width: 100%;
+}
+input#Line:focus-visible {
+	outline: none;
+}
+</style>
+  <script src="./SerialClass.js"></script>
+  <script>
+	let SerSelected=false;
+    function SERop() {
+	  if (!SerSelected) {
+        con = new serial();
+		document.getElementById("SER_op").innerHTML = "Open    A Serial Connection";
+		document.getElementById("SER_op").style.border = "2px solid #0F0";
+		document.getElementById("SEND").style.border = "2px solid #00F";
+		SerSelected = true;
+	  } else {
+		try {
+			con.open();
+			loop();
+		} catch(error) {
+			newError(error);
+		}
+	  }
+    }
+	function SendLine() {
+		if(SerSelected) {
+			let text = document.getElementById("Line").value;
+			document.getElementById("Line").value = "";
+			try {
+				con.write(text);
+			} catch(error) {
+				newError(error);
+			}
+		}
+	}
+	function newError(err) {
+		document.getElementById("Errors").innerHTML = err;
+	}
+	function loop() {
+		let r = con.read();
+		if (r != '') {
+			document.getElementById("recive").innerText += (r + '\n');
+	con.read(true);
+		}
+		setTimeout(loop, 500);
+	}
+  </script>
+</head>
+<body>
+  <div id="buttons">
+    <div id="Errors"></div>
+    <button id="SER_op" onclick="SERop();">Select  A Serial Connection</button>
+	<button id="SEND" onclick="SendLine();">Send</button>
+  </div id="send">
+    <input id="Line" type="text"/>
+  <div>
+  <div id="recive">
+    
+  </div>
+</body>
+</html>
